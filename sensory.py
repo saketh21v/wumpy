@@ -1,6 +1,0 @@
-"""
-stench
-shout
-glitter
-breeze
-"""
