@@ -1,9 +1,25 @@
-from lib.board import Board
-from lib.hero import Hero
+from lib.Arena import Arena
+from lib.Hero import Hero
+from random import randint
 
-board = Board(4);
 
-hero = Hero(board, 0,0)
+arena = Arena(5)
 
-hero.move('right');
-print(hero.xCoord,", ", hero.yCoord)
+hero = Hero(arena, None)
+
+arena.printEverything()
+
+print("Moved = ", hero.moveSelf('right'))
+arena.printBoard()
+print(hero.xCoord, ", ", hero.yCoord)
+print(hero.getSensoryInput())
+
+print("Moved = ", hero.moveSelf('right'))
+arena.printBoard()
+print(hero.xCoord, ", ", hero.yCoord)
+print(hero.getSensoryInput())
+
+print("Moved = ", hero.moveSelf('right'))
+arena.printBoard()
+print(hero.xCoord, ", ", hero.yCoord)
+print(hero.getSensoryInput())
