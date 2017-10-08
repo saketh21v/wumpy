@@ -9,17 +9,4 @@ hero = Hero(arena, None)
 
 arena.printEverything()
 
-print("Moved = ", hero.moveSelf('right'))
-arena.printBoard()
-print(hero.xCoord, ", ", hero.yCoord)
-print(hero.getSensoryInput())
-
-print("Moved = ", hero.moveSelf('right'))
-arena.printBoard()
-print(hero.xCoord, ", ", hero.yCoord)
-print(hero.getSensoryInput())
-
-print("Moved = ", hero.moveSelf('right'))
-arena.printBoard()
-print(hero.xCoord, ", ", hero.yCoord)
-print(hero.getSensoryInput())
+points = hero.play()

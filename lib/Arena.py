@@ -20,21 +20,21 @@ class _NOTATIONS:
     BREEZE = 7
 
 
-def makeBoard(N):
+def makeBoard(N, init):
     board = []
     for i in range(0, N):
             board.append([])
     for item in board:
         for i in range(0, N):
-            item.append(0)
+            item.append(init)
     return board
 
 class Arena(object):
     def __init__(self, N):
         self._EDGE = N - 1
-        self.board = makeBoard(N)
-        self.stenchBoard = makeBoard(N)
-        self.breezeBoard = makeBoard(N)
+        self.board = makeBoard(N, 0)
+        self.stenchBoard = makeBoard(N, 0)
+        self.breezeBoard = makeBoard(N, 0)
 
         print("SIZE = ", len(self.board), ", ", len(self.board[0]))
 
