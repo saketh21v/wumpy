@@ -1,12 +1,13 @@
 from random import randint
 
-# HERO = 'H'
-# GOLD = 'G'
-# WUMPUS = '3'
-# PIT = 'P'
-# GLITTER = 'GL'
-# STENCH = 'S'
-# BREEZE = 'B'
+
+def makeBoard(size, inter):
+    board = []
+    for i in range(size):
+        board.append([])
+        for j in range(size):
+            board[i].append(inter)
+    return board
 
 
 class _NOTATIONS:
@@ -20,21 +21,16 @@ class _NOTATIONS:
     BREEZE = 7
 
 
-def makeBoard(N, init):
-    board = []
-    for i in range(0, N):
-            board.append([])
-    for item in board:
-        for i in range(0, N):
-            item.append(init)
-    return board
-
-class Arena(object):
+class Arena:
     def __init__(self, N):
+        self._SIZE = N
         self._EDGE = N - 1
-        self.board = makeBoard(N, 0)
+        self.board = makeBoard(N, _NOTATIONS.EMPTY)
         self.stenchBoard = makeBoard(N, 0)
         self.breezeBoard = makeBoard(N, 0)
+        self.wumpusBoard = makeBoard(N, 0)
+        self.goldBoard = makeBoard(N, 0)
+        self.pitBoard = makeBoard(N, 0)
 
         print("SIZE = ", len(self.board), ", ", len(self.board[0]))
 
@@ -55,6 +51,7 @@ class Arena(object):
 
         print("GOLD: ", self.goldX, ", ", self.goldY)
         self.board[self.goldY][self.goldX] = _NOTATIONS.GOLD
+        self.goldBoard[self.goldY][self.goldX] = _NOTATIONS.GOLD
         # Not Generating glitter in this version
 
         # WUMPUS
@@ -67,82 +64,86 @@ class Arena(object):
 
         print("WUMPUS: ", self.wumpusX, ", ", self.wumpusY)
         self.board[self.wumpusY][self.wumpusX] = _NOTATIONS.WUMPUS
+        self.wumpusBoard[self.wumpusY][self.wumpusX] = _NOTATIONS.WUMPUS
         self.genStench()
         self.genPits(3)
+
+    def isSafe(self, x, y):
+        if x < 0: return False
+        if y < 0: return False
+        if x > self._EDGE: return False
+        if y > self._EDGE: return False
+        return True
 
     def genStench(self):
         x = self.wumpusX
         y = self.wumpusY
+        if self.isSafe(x-1, y):
+            self.stenchBoard[y][x-1] = _NOTATIONS.STENCH
+        if self.isSafe(x, y-1):
+            self.stenchBoard[y-1][x] = _NOTATIONS.STENCH
+        if self.isSafe(x+1, y):
+            self.stenchBoard[y][x+1] = _NOTATIONS.STENCH
+        if self.isSafe(x, y+1):
+            self.stenchBoard[y+1][x] = _NOTATIONS.STENCH
+        return 
 
-        if y > 0:
-            self.stenchBoard[y - 1][x] = _NOTATIONS.STENCH
-        if y < self._EDGE - 1:
-            self.stenchBoard[y + 1][x] = _NOTATIONS.STENCH
-        if x > 0:
-            self.stenchBoard[y][x - 1] = _NOTATIONS.STENCH
-        if x < self._EDGE - 1:
-            self.stenchBoard[y][x + 1] = _NOTATIONS.STENCH
+    
+    def genBreeze(self, x, y):
+        if self.isSafe(x-1, y):
+            self.breezeBoard[y][x-1] = _NOTATIONS.BREEZE
+        if self.isSafe(x, y-1):
+            self.breezeBoard[y-1][x] = _NOTATIONS.BREEZE
+        if self.isSafe(x+1, y):
+            self.breezeBoard[y][x+1] = _NOTATIONS.BREEZE
+        if self.isSafe(x, y+1):
+            self.breezeBoard[y+1][x] = _NOTATIONS.BREEZE
 
     def genPits(self, NPITS):
         emptyCells = 0
         for i in range(self._EDGE):
-            emptyCells += self.board[i].count(0)
+            emptyCells += self.board[i].count(_NOTATIONS.EMPTY)
         if NPITS > emptyCells:
-            for i in range(self._EDGE):
-                for j in range(self._EDGE):
-                    if self.board[i][j] == 0:
-                        self.board[i][j] = _NOTATIONS.PIT
-                        self.genBreeze(i, j)
-            # return True
+            for x in range(self._EDGE):
+                for y in range(self._EDGE):
+                    if self.board[y][x] == 0:
+                        self.board[y][x] = _NOTATIONS.PIT
+                        self.pitBoard[y][x] = _NOTATIONS.PIT
+                        self.genBreeze(x, y)
         else:
             for i in range(NPITS):
-                x = randint(0, self._EDGE - 1)
-                y = randint(0, self._EDGE - 1)
-                print("x = ", x, " y = ", y, " code = ",self.board[x][y])
-                while self.board[x][y] != 0:
+                x = randint(0, self._EDGE)
+                y = randint(0, self._EDGE)
+                print("x = ", x, " y = ", y, " code = ",self.board[y][x])
+                while self.board[y][x] != 0:
                     x = randint(0, self._EDGE - 1)
                     y = randint(0, self._EDGE - 1)
-                self.board[x][y] = _NOTATIONS.PIT
+                self.board[y][x] = _NOTATIONS.PIT
+                self.pitBoard[y][x] = _NOTATIONS.PIT
                 self.genBreeze(x, y)
-        # return True
-
-    def genBreeze(self, x, y):
-        if y > 0:
-            self.breezeBoard[y - 1][x] = _NOTATIONS.BREEZE
-        if y < self._EDGE - 1:
-            self.breezeBoard[y + 1][x] = _NOTATIONS.BREEZE
-        if x > 0:
-            self.breezeBoard[y][x - 1] = _NOTATIONS.BREEZE
-        if x < self._EDGE - 1:
-            self.breezeBoard[y][x + 1] = _NOTATIONS.BREEZE
-
-    def isValid(self, x, y):
-        xTrue = True
-        yTrue = True
-        if x > self._EDGE or x < 0:
-            xTrue = False
-        if y > self._EDGE or y < 0:
-            yTrue = False
-        return xTrue, yTrue
+        return
 
     def printEverything(self):
         print("Hero: ", self.heroX, ", ", self.heroY)
         print("GOLD: ", self.goldX, ", ", self.goldY)
         print("WUMPUS: ", self.wumpusX, ", ", self.wumpusY)
         print("Board: ")
-        for i in range(0, self._EDGE):
+        for i in range(0, self._EDGE+1):
             print(self.board[i])
         print("Stench: ")
-        for i in range(0, self._EDGE):
+        for i in range(0, self._EDGE+1):
             print(self.stenchBoard[i])
         print("Breeze: ")
-        for i in range(0, self._EDGE):
+        for i in range(0, self._EDGE+1):
             print(self.breezeBoard[i])
+        print("Pits: ")
+        for i in range(0, self._EDGE+1):
+            print(self.pitBoard[i])
 
     def printBoard(self):
         print("Board: ")
         for i in range(0, self._EDGE+1):
             print(self.board[i])
 
-# arena = Arena(5)
-# arena.printEverything()
+arena = Arena(5)
+arena.printEverything()

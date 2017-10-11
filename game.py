@@ -1,11 +1,11 @@
 from lib.Arena import Arena
-from lib.Hero import Hero
+from lib.Agent import Agent
 from random import randint
 
 
 arena = Arena(5)
 
-hero = Hero(arena, None)
+hero = Agent(arena)
 
 arena.printEverything()
 
