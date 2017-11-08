@@ -144,6 +144,3 @@ class Arena:
         print("Board: ")
         for i in range(0, self._EDGE+1):
             print(self.board[i])
-
-arena = Arena(5)
-arena.printEverything()

@@ -25,8 +25,8 @@ class Agent:
                             [self.xCoord] == _NOTATIONS.WUMPUS)
         senses['GOLD'] = (self.arena.goldBoard[self.yCoord]
                           [self.xCoord] == _NOTATIONS.GOLD)
-        senses['PIT'] = (self.arena.pitBoard[self.xCoord]
-                         [self.yCoord] == _NOTATIONS.PIT)
+        senses['PIT'] = (self.arena.pitBoard[self.yCoord]
+                         [self.xCoord] == _NOTATIONS.PIT)
         senses['GLITTER'] = (self.board[self.yCoord]
                              [self.xCoord] == _NOTATIONS.GLITTER)
         senses['STENCH'] = (self.arena.stenchBoard[self.yCoord]
@@ -90,15 +90,16 @@ class Agent:
     def setCell(self, x, y, CODE, board):
         if x < 0 or y < 0 or x > self.arena._EDGE or y > self.arena._EDGE:
             return
-        if board[y][x] == -1:
-            board[y][x] = CODE
+        board[y][x] += 1
 
     def play(self):
         vBoard= makeBoard(self.arena._SIZE, 0)
-        wBoard= makeBoard(self.arena._SIZE, 0)
-        pBoard= makeBoard(self.arena._SIZE, 0)
+        wBoard= makeBoard(self.arena._SIZE, -1)
+        pBoard= makeBoard(self.arena._SIZE, -1)
 
         senses= self.getSenses()
+        print("SENSES: ", senses)
+        self.arena.printBoard()
 
         if senses['WUMPUS'] or senses['PIT'] or senses['GOLD']:
             print("Wrong setup. Agent start position overlapping")
@@ -132,6 +133,9 @@ class Agent:
             noDir= True
             print("X = ", x, " Y = ", y)
 
+            print("PITS")
+            print(pBoard)
+
             for d in direc:
                 sX, sY = self.getXY(d, x, y)
                 print("Testing coords = ", sX, ", ", sY)
@@ -141,7 +145,7 @@ class Agent:
                 # Else => isSafe
                 # Have to check if any pits or wumpus maybe present there
                 # Need to improve this. This is very stupid
-                if not (pBoard[sY][sX] == _NOTATIONS.PIT or wBoard[sY][sX] == _NOTATIONS.WUMPUS):
+                if not (pBoard[sY][sX] > 2  or wBoard[sY][sX] > 2):
                     direc[d]= True
                     print("Direction ", d, "is okay")
                     noDir= False
@@ -179,8 +183,6 @@ class Agent:
             print("Senses = ", senses)
             # End of the while loop
         
-        self.arena.printBoard()
-        print("Senses = ", senses)
         if senses['GOLD']:
             self.points += 1000
             print("I'm rich")
